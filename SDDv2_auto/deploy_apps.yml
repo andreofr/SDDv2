@@ -1,0 +1,42 @@
+---
+################################################################################
+# Title      : deploy_apps.yml
+# Author     : 
+# Date       : 18/05/2018
+################################################################################
+# Description
+#-------------------------------------------------------------------------------
+# Version : 1.0
+# deploy Jboss apps
+################################################################################
+# Description
+# 
+# 
+# - deploiement des ear
+# Usage : ansible-playbook -i 'CMVIL2732036', deploy_apps.yml 
+################################################################################
+# Wiki
+#-------------------------------------------------------------------------------
+# Link : 
+################################################################################
+
+- name: Deployment on front-office 
+  hosts: front
+  gather_facts: no
+
+  tasks:
+
+  - name: Check Jboss
+    stat: path=/opt/jboss
+    register: jboss_stat
+
+  - block:
+
+    - name: Include role deploy_apps
+      include_role: 
+        name: deploy_apps
+      with_items: "{{components}}" 
+      loop_control:
+        loop_var: instance
+
+    when: jboss_stat.stat.exists

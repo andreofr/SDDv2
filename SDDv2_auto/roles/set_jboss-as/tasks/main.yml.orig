@@ -1,0 +1,35 @@
+---
+############################################################################################
+# Title      : main.yml -
+# Procedure  : configuration Universal Messaging sous JBoss 6
+# Date       : 18/05/2018
+#############################################################################################
+# Description
+# - tasks file for set_jboss-as
+#   Configure Jboss file jboss-as.conf 
+#
+# - inputs: 
+#
+# - dependencies: 
+#
+#
+#############################################################################################
+
+- name: Find instance
+  find:
+      patterns: "^[\\d]_DUIRRL_*"
+      use_regex: yes
+      paths: /opt/jboss/instances
+      file_type: directory
+  register: instance
+
+- name: Var instance
+  debug: msg="instance  {{instance.files[0].path}}"
+ 
+#- name: Configuration block in jboss_as.conf
+#  blockinfile:
+#    path: "{{instance.files[0].path}}/jboss-as.conf"
+#    block: |
+#      JAVA_OPTS="$JAVA_OPTS -Denv.appconfig.path={{instance.files[0].path}}/extra-instance-modules/cnav/appconf/main/appconf"
+#      JAVA_OPTS="$JAVA_OPTS -Dlog4j.configurationFile=file:{{instance.files[0].path}}/extra-instance-modules/cnav/appconf/main/appconf/log4j2.xml"
+

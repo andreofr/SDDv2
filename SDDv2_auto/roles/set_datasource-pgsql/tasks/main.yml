@@ -1,0 +1,76 @@
+---
+############################################################################################
+# Title      : main.yml -
+# Procedure  : configuration Universal Messaging sous JBoss 6
+# Date       : 18/05/2018
+#############################################################################################
+# Description
+# - tasks file for set_datasource-pgsql
+#   Configure Jboss driver et datasource
+#
+# - inputs: 
+#
+# - dependencies: 
+#
+#
+#############################################################################################
+
+- name: Find instance "{{instance|upper}}"
+  find:
+    patterns: "^(.*){{instance|upper}}$"
+    recurse: no
+    use_regex: yes
+    paths: "{{PATH_INSTANCES}}"
+    file_type: directory
+  register: find_instance
+
+- name: Display path
+  debug:
+    msg: "{{find_instance.files[0].path}}"
+  when: find_instance.matched != 0 and find_instance.files[0].path is defined
+
+- name: Extract instance numero
+  set_fact: numero_instance="{{find_instance.files[0].path.split('/')[4].split('_')[0]}}"
+  when: find_instance.matched != 0 and find_instance.files[0].path is defined
+
+- name: Configuration block in jboss_datasource_postgresql.env
+  blockinfile:
+    path: "{{PATH_SCRIPTS}}/jboss_datasource_postgresql.env"
+    block: |
+      DS_NAME=jpa-service-sdd-miroir-sapp
+      DS_JNDINAME=java:jboss/datasources/sdd-teleservice
+      DS_HOST=SLQ00067.n18.an.cnav
+      DS_PORT=5433
+      DS_URL=jdbc:postgresql://${DS_HOST}:${DS_PORT}/tsddq1_db2
+      DS_USER=tsdddb2le_ro
+      DS_PASS=tsdddb2le_ro
+
+
+#- name: Display numero instance
+#  debug:
+#    msg: "{{numero_instance}}"
+#  when: find_instance.matched != 0 and numero_instance is defined
+
+- name: Re-run Jboss instance "{{numero_instance}}" on --admin-only
+  shell: "nohup {{PATH_SCRIPTS}}/jboss_instance_manage.sh {{numero_instance}} restart --admin-only >/dev/null 2>&1"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  when: find_instance.matched != 0 and numero_instance is defined and numero_instance | int > 0
+  changed_when: false
+
+- name: Config driver postgresql
+  command: "{{PATH_SCRIPTS}}/jboss_jdbc_driver_postgresql.sh {{numero_instance}} -a"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  when: find_instance.matched != 0 and numero_instance is defined and numero_instance | int > 0
+
+- name: Config datasource postgresql
+  command: "{{PATH_SCRIPTS}}/jboss_datasource_postgresql.sh {{numero_instance}} -a"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  when: find_instance.matched != 0 and numero_instance is defined and numero_instance | int > 0
+
+- name: Delete block in jboss_datasource_postgresql.env
+  blockinfile:
+    path: "{{PATH_SCRIPTS}}/jboss_datasource_postgresql.env"
+    state: absent

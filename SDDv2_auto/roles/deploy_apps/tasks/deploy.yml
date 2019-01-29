@@ -1,0 +1,72 @@
+---
+#############################################################################################
+# Title      : deploy.yml -
+# Procedure  : configuration Universal Messaging sous JBoss 6
+# Date       : 18/05/2018
+#############################################################################################
+# Description
+# - tasks file for deploy_apps
+#   Deploy Jboss apps
+#
+# - inputs: instance_name 
+#
+# - dependencies: 
+#
+# 
+#############################################################################################
+
+- name: "Extract component {{file_apps}}"
+  set_fact: 
+    component_ear: "{{file_apps.split('/')[6] | regex_replace('(\\w+.*)-(\\d+\\.){3}(ear|war)', '\\1')}}"
+  when: file_apps is defined  
+
+- name:  "Test regexp component_ear {{component_ear}}" 
+  assert:
+    that: 'component_ear | regex_search("^(\w+\-)+(\w+)$")'
+    msg: "component_ear : {{component_ear}}"
+
+- name: List deployment
+  command: "{{PATH_SCRIPTS}}/jboss_instance_appdeployer.sh {{numero_instance}} -listapps"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  register: deploy
+  changed_when: false
+
+- name: Display list apps deploy
+  debug:
+    msg: "{{deploy.stdout_lines}}"
+  when: deploy is defined  
+
+- name: Extract undeploy component
+  set_fact: 
+    undeploy_component: "{{item.split(':')[-1]}}"
+  with_items: "{{deploy.stdout_lines}}"
+  when: item.split(':')[-1] | trim | match(component_ear)
+
+- name: Display undeploy component
+  debug:
+    msg: "{{undeploy_component}}"
+  when: undeploy_component is defined
+
+- name: "Undeploy component : {{undeploy_component}}" 
+  command: "nohup {{PATH_SCRIPTS}}/jboss_instance_appdeployer.sh {{numero_instance}} -undeploy {{undeploy_component}}"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  when: undeploy_component is defined
+
+- name: "Deploy component : {{file_apps}}"
+  command: "nohup {{PATH_SCRIPTS}}/jboss_instance_appdeployer.sh {{numero_instance}} -deploy {{file_apps}} --force"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+
+- name: List deployment 
+  command: "{{PATH_SCRIPTS}}/jboss_instance_appdeployer.sh {{numero_instance}} -listapps"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  register: list_deploy
+  changed_when: false
+
+- name: Display list apps deploy  
+  debug:
+    msg: "{{list_deploy.stdout_lines}}"
+  when: list_deploy is defined

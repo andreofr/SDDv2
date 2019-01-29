@@ -1,0 +1,75 @@
+---
+#############################################################################################
+# Title      : main.yml -
+# Procedure  : configuration Universal Messaging sous JBoss 6
+# Date       : 18/05/2018
+#############################################################################################
+# Description
+# - tasks file for deploy_apps
+#   Deploy Jboss apps
+#
+# - inputs: instance_name 
+#
+# - dependencies: 
+#
+# 
+#############################################################################################
+
+- name: Find instance "{{instance|upper}}" 
+  find:
+    patterns: "^(.*){{instance|upper}}"
+    recurse: no
+    use_regex: yes
+    paths: "{{PATH_INSTANCES}}"
+    file_type: directory
+  register: find_instance
+
+- name: Find file_ear war or ear
+  find:
+    patterns: '.*\.war|.*\.ear'
+    paths: "{{item}}"
+    use_regex: yes
+    recurse: yes
+  register: file_ear
+  with_items: "{{find_instance.files|map(attribute='path')|sort}}"
+
+- name: Extract multiple_files_apps
+  set_fact:
+    multiple_files_apps: "{{file_ear.results|map(attribute='files')|first|map(attribute='path')|sort}}"
+  when: file_ear is defined
+
+- name: "Display {{multiple_files_apps}}"
+  debug:
+    var: multiple_files_apps
+
+- name: Extract instance numero
+  set_fact:
+    numero_instance: "{{item.path.split('/')[4].split('_')[0]}}"
+  with_items: "{{find_instance.files}}"
+  when: find_instance.files is defined
+
+- name: Test numero_instance "{{numero_instance}}"
+  assert:
+    that:
+    - numero_instance|int > 0
+    - numero_instance|int < 9
+    msg: "numero_instance : {{numero_instance}}"
+
+- name: Re-run Jboss instance "{{numero_instance}}"
+  command: "nohup {{PATH_SCRIPTS}}/jboss_instance_manage.sh {{numero_instance}} restart"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  changed_when: false
+
+- name: "Include deploy tasks"
+  include_tasks: deploy.yml
+  with_items:
+    - "{{multiple_files_apps}}"
+  loop_control:
+    loop_var: file_apps
+
+- name: "Purge {{multiple_files_apps}}"
+  file:
+    path: "{{item}}"
+    state: absent
+  with_items: "{{multiple_files_apps}}"

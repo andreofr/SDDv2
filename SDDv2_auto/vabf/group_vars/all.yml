@@ -1,0 +1,12 @@
+---
+APPLI_NAME: "SDD"
+#WORKSPACE: "~/workspace/sdd-ansible-deploy"
+WORKSPACE: "~/SDDv2"
+JBOSS_MANAGEMENT: "{{WORKSPACE}}/jboss-management"
+PATH_INSTANCES: "/opt/jboss/instances"
+PATH_SCRIPTS: "/opt/jboss/scripts"
+PATH_WIREMOCK: "/opt/jboss/wiremock"
+PATH_EXTRA: "extra-instance-modules/cnav/appconf/main"
+
+components: 
+- "{{more_components}}"

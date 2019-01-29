@@ -1,0 +1,41 @@
+---
+################################################################################
+# Title      : create_instances.yml
+# Author     : 
+# Date       : 18/05/2018
+################################################################################
+# Description
+#-------------------------------------------------------------------------------
+# Version : 1.0
+# Create Jboss instances
+################################################################################
+# Description
+# - create Jboss instances
+#
+# Usage : ansible-playbook -i 'CMVIL2732036', create_instances.yml 
+################################################################################
+# Wiki
+#-------------------------------------------------------------------------------
+# Link : 
+################################################################################
+
+- name: Create instances on front-office 
+  hosts: front
+  gather_facts: no
+
+  tasks:
+
+  - name: Check Jboss is installed
+    stat: path=/opt/jboss
+    register: jboss_stat
+
+  - block:
+
+    - name: Include role create_instance
+      include_role: 
+        name: create_instance
+      with_items: "{{components}}" 
+      loop_control:
+        loop_var: instance
+
+    when: jboss_stat.stat.exists

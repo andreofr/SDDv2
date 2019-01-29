@@ -1,0 +1,4 @@
+---
+# vars file for set_jboss-as
+PATH_INSTANCES: /opt/jboss/instances
+PATH_EXTRA: extra-instance-modules/cnav/appconf/main

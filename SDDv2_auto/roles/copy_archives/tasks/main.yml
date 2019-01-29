@@ -1,0 +1,152 @@
+---
+################################################################################
+# Title      : copy_archives.yml
+# Author     : 
+# Date       : 18/05/2018
+################################################################################
+# Description
+#-------------------------------------------------------------------------------
+# Version : 1.0
+# Create Jboss instance
+################################################################################
+# Description
+# 
+# 
+# - copie les archives avant le deploiement
+# Usage : ansible-playbook -i 'CMVIL2732036', copy_archives.yml 
+################################################################################
+# Wiki
+#-------------------------------------------------------------------------------
+# Link : 
+################################################################################
+  
+- name: Find local file archive ear
+  local_action:
+    module: find
+    patterns: "(.*){{instance|lower}}(.*).ear" 
+    recurse: yes
+    use_regex: yes
+    paths: "{{WORKSPACE}}"
+  register: file_ear
+  changed_when: false
+
+- name: Display file archive ear file_ear
+  debug: 
+    msg: "{{file_ear.files.0.path}}"
+  when: file_ear.files.0 is defined
+
+- name: Find deploy dir
+  find:
+    patterns: "^(.*){{instance|upper}}$"
+    use_regex: yes
+    paths: "{{PATH_INSTANCES}}"
+    file_type: directory
+  register: dir_deploy
+  changed_when: false 
+
+- name: Display dir_deploy
+  debug: 
+    msg: "{{dir_deploy.files[0].path}}"
+  when: dir_deploy.matched != 0 and dir_deploy.files[0] is defined
+
+###########################################################################
+
+
+- name: Replace JBOSS_INSTANCE_LOG_HOME in jboss-as.conf 
+  replace:
+    regexp: "^JBOSS_INSTANCE_LOG_HOME=/tmp/jboss/\\$JBOSS_INSTANCE"
+    replace: "JBOSS_INSTANCE_LOG_HOME=/logs/jboss/servers/$JBOSS_INSTANCE"
+    path: "{{item.path}}/jboss-as.conf"
+    backup: yes
+  with_items: 
+    - "{{dir_deploy.files}}"
+
+- name: Replace path in module.xml
+  replace:
+    regexp: 'path="."'
+    replace: 'path="properties"'
+    path: "{{item.path}}/{{PATH_EXTRA}}/module.xml"
+    backup: yes
+  with_items: 
+    - "{{dir_deploy.files}}"
+
+- name: Replace default-cache in standalone.xml
+  replace:
+    regexp: 'default-cache="local-query"'
+    replace: 'default-cache="entity" start="EAGER"'
+    path: "{{item.path}}/configuration/standalone-cnav.xml"
+    backup: yes
+  with_items: 
+    - "{{dir_deploy.files}}"
+
+
+###########################################################################
+
+- name: Copy "{{instance}}" ear
+  copy: 
+    src: "{{file_ear.files.0.path}}"
+    dest: "{{item.path}}/DIR_EAR/"
+    backup: yes
+  with_items:
+     - "{{dir_deploy.files}}" 
+  when: dir_deploy.matched != 0 and file_ear.files.0 is defined
+
+- name: Find local dir conf
+  local_action:
+    module: find
+    patterns: "(.*){{instance|lower}}-conf"
+    recurse: yes
+    use_regex: yes
+    paths: "{{WORKSPACE}}"
+    file_type: directory
+  register: dir_conf
+  changed_when: false
+
+- name: Display dir_conf
+  debug: var="{{item}}"
+  with_items: dir_conf.files.0.path
+  when: dir_conf.files.0 is defined
+
+#- name: Copy extra-instance-modules
+#  copy: 
+#    src: "{{dir_conf.files.0.path}}/"
+#    dest: "{{item.path}}/{{PATH_EXTRA}}"
+#    backup: yes
+#  with_items:
+#     - "{{ dir_deploy.files }}" 
+#  when: dir_deploy.matched != 0 and dir_conf.files.0 is defined
+
+##############################################################
+
+#- name: Find properties files
+#  find:
+#    patterns: "^(.*)(log4j2\\.xml|properties)$"
+#    recurse: yes
+#    use_regex: yes
+#    paths: "{{item.path}}/{{PATH_EXTRA}}"
+#  with_items: 
+#    - "{{dir_deploy.files}}"
+#  register: properties
+#  changed_when: false
+
+- name: Create properties dir
+  file:
+    path: "{{dir_deploy.files[0].path}}/{{PATH_EXTRA}}/properties"
+    state: directory
+ 
+#- name: Copy properties files
+#  copy:
+#    src: "{{item.path}}"
+#    dest: "{{dir_deploy.files[0].path}}/{{PATH_EXTRA}}/properties"
+#    remote_src: yes
+#    backup: yes
+#  with_items: "{{properties.results.0.files}}"
+
+- name: Copy properties files
+  copy: 
+    src: "{{dir_conf.files.0.path}}/"
+    dest: "{{item.path}}/{{PATH_EXTRA}}/properties"
+    backup: yes
+  with_items:
+     - "{{ dir_deploy.files }}" 
+  when: dir_deploy.matched != 0 and dir_conf.files.0 is defined

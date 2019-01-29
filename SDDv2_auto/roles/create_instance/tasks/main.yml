@@ -1,0 +1,39 @@
+---
+############################################################################################
+# Title      : main.yml -
+# Procedure  : configuration Universal Messaging sous JBoss 6
+# Date       : 18/05/2018
+#############################################################################################
+# Description
+# - tasks file for create_instance
+#   Create Jboss instance
+#
+# - inputs: instances
+#
+# - dependencies: 
+#
+#############################################################################################
+
+- name: Find instance "{{instance}}"
+  find:
+    patterns: "^(.*){{instance|upper}}$"
+    use_regex: yes
+    paths: "{{PATH_INSTANCES}}"
+    file_type: directory
+  register: instances
+
+- name: Configure jboss_instance_create.env
+  lineinfile:
+      dest: "{{PATH_SCRIPTS}}/jboss_instance_create.env"
+      regexp: ^INSTANCENAME
+      line: "INSTANCENAME={{APPLI_NAME}}_{{instance}}"
+  when: instances.matched == 0
+  changed_when: false
+
+- name: Create new Jboss instance "{{instance}}" 
+  shell: "nohup {{PATH_SCRIPTS}}/jboss_instance_create.sh"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+    executable: /bin/bash
+  when: instances.matched == 0 
+

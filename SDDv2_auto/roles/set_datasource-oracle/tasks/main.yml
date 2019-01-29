@@ -1,0 +1,76 @@
+---
+############################################################################################
+# Title      : main.yml -
+# Procedure  : configuration Universal Messaging sous JBoss 6
+# Date       : 18/05/2018
+#############################################################################################
+# Description
+# - tasks file for set_datasource-oracle
+#   Configure Jboss driver et datasource
+#
+# - inputs: 
+#
+# - dependencies: 
+#
+#
+#############################################################################################
+
+- name: Find instance "{{instance|upper}}"
+  find:
+    patterns: "^(.*){{instance|upper}}$"
+    recurse: no
+    use_regex: yes
+    paths: "{{PATH_INSTANCES}}"
+    file_type: directory
+  register: find_instance
+
+- name: Display path
+  debug:
+    msg: "{{find_instance.files[0].path}}"
+  when: find_instance.matched != 0 and find_instance.files[0].path is defined
+
+- name: Extract instance numero
+  set_fact: numero_instance="{{find_instance.files[0].path.split('/')[4].split('_')[0]}}"
+  when: find_instance.matched != 0 and find_instance.files[0].path is defined
+
+- name: Configuration block in jboss_datasource_oracle.env
+  blockinfile:
+    path: "{{PATH_SCRIPTS}}/jboss_datasource_oracle.env"
+    block: |
+      DS_NAME=NotariatDS
+      DS_JNDINAME=java:jboss/datasources/NotariatDS
+      DS_HOST=SLQ02318.n18.an.cnav
+      DS_PORT=1521
+      DS_URL=jdbc:oracle:thin:@${DS_HOST}:${DS_PORT}:XNOTAQ01
+      DS_USER=anoto1
+      DS_PASS=anoto1
+
+
+#- name: Display numero instance
+#  debug:
+#    msg: "{{numero_instance}}"
+#  when: find_instance.matched != 0 and numero_instance is defined
+
+- name: Re-run Jboss instance "{{numero_instance}}" on --admin-only
+  shell: "nohup {{PATH_SCRIPTS}}/jboss_instance_manage.sh {{numero_instance}} restart --admin-only >/dev/null 2>&1"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  when: find_instance.matched != 0 and numero_instance is defined and numero_instance | int > 0
+#  changed_when: false
+
+- name: Config driver oracle
+  shell: "{{PATH_SCRIPTS}}/jboss_jdbc_driver_oracle.sh {{numero_instance}} -a"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  when: find_instance.matched != 0 and numero_instance is defined and numero_instance | int > 0
+
+- name: Config datasource oracle
+  shell: "{{PATH_SCRIPTS}}/jboss_datasource_oracle.sh {{numero_instance}} -a"
+  args:
+    chdir: "{{PATH_SCRIPTS}}"
+  when: find_instance.matched != 0 and numero_instance is defined and numero_instance | int > 0
+
+- name: Delete block in jboss_datasource_oracle.env
+  blockinfile:
+    path: "{{PATH_SCRIPTS}}/jboss_datasource_oracle.env"
+    state: absent

@@ -1,0 +1,11 @@
+---
+more_components: 
+- "GESTION"
+- "MIROIR"
+
+datasource:
+  oracle:
+    - { instance: "GESTION" }
+    - { instance: "MIROIR" }
+  pgsql:
+    - { instance: "MIROIR" }

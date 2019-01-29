@@ -1,0 +1,14 @@
+---
+DS_JNDINAME_SME: "java:jboss/duirDS"
+DS_JNDINAME_SME_ADR: "java:jboss/duirAdrDS"
+
+more_components:
+- "SME"
+- "SINT-ADR"
+- "SME-ADR"
+
+datasources:
+- { instance: "sme", ds_jndiname: "{{DS_JNDINAME_SME}}" }
+- { instance: "sme-adr", ds_jndiname: "{{DS_JNDINAME_SME_ADR}}" }
+
+

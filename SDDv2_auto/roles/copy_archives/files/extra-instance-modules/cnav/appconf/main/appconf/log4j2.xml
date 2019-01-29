@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Properties>
+    <Property name="log-path">${sys:jboss.server.log.dir}</Property>
+    <Property name="log-filename">logDrl-sme-adresse</Property>perty>
+  </Properties>
+
+  <Appenders>
+    <RollingRandomAccessFile name="file" fileName="${log-path}/${log-filename}.log"
+                             filePattern="${log-path}/${log-filename}-%d{yyyy-MM-dd}.log">
+      <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%-5p] %C{6} %M [%L]: %msg%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
+        <SizeBasedTriggeringPolicy size="1 MB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="10"/>
+    </RollingRandomAccessFile>
+    <Console name="console" target="SYSTEM_OUT">
+      <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%-5p] %C{6} %M [%L]: %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="ERROR">
+      <appender-ref ref="console" level="ERROR"/>
+    </Root>
+    <Logger name="cnav" level="DEBUG" additivity="true">
+      <appender-ref ref="file" level="DEBUG"/>
+    </Logger>
+  </Loggers>
+</Configuration>
