@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+     <groupId>fr.cnav</groupId>
+     <artifactId>SDDv2-parent</artifactId>
+     <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>SDDv2-suividemande</artifactId>
+  <packaging>pom</packaging>
+  <name>SDDv2-suividemande</name>
+
+  <dependencies>
+
+      <dependency>
+        <groupId>cnav.gipur.sdd</groupId>
+        <artifactId>suivi-demande-sme</artifactId>
+        <version>${plugin.version}</version>
+        <type>ear</type>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.sdd</groupId>
+        <artifactId>suivi-demande-sme-conf</artifactId>
+        <version>${plugin.version}</version>
+        <classifier>integration</classifier>
+        <type>tar.gz</type>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.pci.teleservice.sdd</groupId>
+        <artifactId>suivi-demande-sapp</artifactId>
+        <version>${plugin.version}</version>
+        <type>ear</type>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.pci.teleservice.sdd</groupId>
+        <artifactId>suivi-demande-sapp-conf</artifactId>
+        <version>${plugin.version}</version>
+        <classifier>integration</classifier>
+        <type>tar.gz</type>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.pci.teleservice.sdd</groupId>
+        <artifactId>suivi-demande-sapp-ui</artifactId>
+        <version>${plugin.version}</version>
+        <type>war</type>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.sdd.sint</groupId>
+        <artifactId>suivi-demandes-sint</artifactId>
+        <version>${plugin.version}</version>
+        <type>ear</type>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.sdd.sint</groupId>
+        <artifactId>suivi-demandes-sint-conf</artifactId>
+        <version>${plugin.version}</version>
+        <classifier>integration</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.agents.services</groupId>
+        <artifactId>service-sdd-gestion-sapp</artifactId>
+        <version>${plugin.version}</version>
+        <type>ear</type>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.agents.services</groupId>
+        <artifactId>service-sdd-gestion-sapp-conf</artifactId>
+        <version>${plugin.version}</version>
+        <classifier>cni</classifier>
+        <type>tar.gz</type>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.agents.services.sdd</groupId>
+        <artifactId>service-sdd-miroir-sapp</artifactId>
+        <version>${plugin.version}</version>
+        <type>ear</type>
+      </dependency>
+
+      <dependency>
+        <groupId>cnav.gipur.agents.services.sdd</groupId>
+        <artifactId>service-sdd-miroir-sapp-conf</artifactId>
+        <version>${plugin.version}</version>
+        <classifier>cni</classifier>
+        <type>tar.gz</type>
+      </dependency>
+
+  </dependencies>
+
+  <build>
+
+     <plugins>
+        <plugin>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.0.2</version>
+          <executions>
+	    <execution>
+              <id>copy</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                     <groupId>cnav.gipur.sdd</groupId>
+                     <artifactId>suivi-demande-sme</artifactId>
+                     <type>ear</type>
+                     <outputDirectory>${project.build.directory}/sdd-sme</outputDirectory>
+                  </artifactItem>
+                  <artifactItem>
+                     <groupId>cnav.gipur.pci.teleservice.sdd</groupId>
+                     <artifactId>suivi-demande-sapp</artifactId>
+                     <type>ear</type>
+                     <outputDirectory>${project.build.directory}/sdd-sapp</outputDirectory>
+                  </artifactItem>
+                  <artifactItem>
+                     <groupId>cnav.gipur.pci.teleservice.sdd</groupId>
+                     <artifactId>suivi-demande-sapp-ui</artifactId>
+                     <type>war</type>
+                     <outputDirectory>${project.build.directory}/sdd-sapp</outputDirectory>
+                  </artifactItem>
+
+                  <artifactItem>
+                     <groupId>cnav.gipur.sdd.sint</groupId>
+                     <artifactId>suivi-demandes-sint</artifactId>
+                     <type>ear</type>
+                     <outputDirectory>${project.build.directory}/sdd-sint</outputDirectory>
+                  </artifactItem>
+
+                  <artifactItem>
+                    <groupId>cnav.gipur.agents.services</groupId>
+                    <artifactId>service-sdd-gestion-sapp</artifactId>
+                     <type>ear</type>
+                     <outputDirectory>${project.build.directory}/service-sdd-gestion</outputDirectory>
+                  </artifactItem>
+                  <artifactItem>
+                     <groupId>cnav.gipur.agents.services.sdd</groupId>
+                     <artifactId>service-sdd-miroir-sapp</artifactId>
+                     <type>ear</type>
+                     <outputDirectory>${project.build.directory}/service-sdd-miroir</outputDirectory>
+                  </artifactItem>
+
+                </artifactItems>
+              </configuration>
+            </execution>
+
+            <execution>
+              <id>unpack</id>
+              <phase>package</phase>
+              <goals>
+                 <goal>unpack</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                     <groupId>cnav.gipur.sdd</groupId>
+                     <artifactId>suivi-demande-sme-conf</artifactId>
+                     <classifier>integration</classifier>
+                     <type>tar.gz</type>
+                     <outputDirectory>${project.build.directory}/sdd-sme</outputDirectory>
+                  </artifactItem>
+                  <artifactItem>
+                     <groupId>cnav.gipur.pci.teleservice.sdd</groupId>
+                     <artifactId>suivi-demande-sapp-conf</artifactId>
+                     <classifier>integration</classifier>
+                     <type>tar.gz</type>
+                     <outputDirectory>${project.build.directory}/sdd-sapp</outputDirectory>
+                  </artifactItem>
+                  <artifactItem>
+                     <groupId>cnav.gipur.sdd.sint</groupId>
+                     <artifactId>suivi-demandes-sint-conf</artifactId>
+                     <classifier>integration</classifier>
+                     <outputDirectory>${project.build.directory}/sdd-sint</outputDirectory>
+                  </artifactItem>
+                  <artifactItem>
+                     <groupId>cnav.gipur.agents.services</groupId>
+                     <artifactId>service-sdd-gestion-sapp-conf</artifactId>
+                     <classifier>cni</classifier>
+                     <type>tar.gz</type>
+                     <outputDirectory>${project.build.directory}/service-sdd-gestion</outputDirectory>
+                  </artifactItem>
+                  <artifactItem>
+                     <groupId>cnav.gipur.agents.services.sdd</groupId>
+                     <artifactId>service-sdd-miroir-sapp-conf</artifactId>
+                     <classifier>cni</classifier>
+                     <type>tar.gz</type>
+                     <outputDirectory>${project.build.directory}/service-sdd-miroir</outputDirectory>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+
+
+          </executions>
+        </plugin>
+     </plugins>
+  </build>
+
+</project>

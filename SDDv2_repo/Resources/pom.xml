@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+     <groupId>fr.cnav</groupId>
+     <artifactId>SDDv2-parent</artifactId>
+     <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>SDDv2-resources</artifactId>
+  <name>SDDv2-resources</name>
+  <packaging>jar</packaging>
+
+  <properties>
+    <descriptor.path>src/main/filters</descriptor.path>
+    <descriptor.filter.gestion>${project.basedir}/${descriptor.path}/qualif/filter_gestion_qualif.properties</descriptor.filter.gestion>
+    <descriptor.filter.miroir>${project.basedir}/${descriptor.path}/qualif/filter_miroir_qualif.properties</descriptor.filter.miroir>
+  </properties>
+
+  <profiles>
+    <profile>
+       <id>qualif</id>
+       <properties>
+          <descriptor.filter.gestion>${project.basedir}/${descriptor.path}/qualif/filter_gestion_qualif.properties</descriptor.filter.gestion>
+          <descriptor.filter.miroir>${project.basedir}/${descriptor.path}/qualif/filter_miroir_qualif.properties</descriptor.filter.miroir>
+       </properties>
+    </profile>
+
+    <profile>
+       <id>vabf</id>
+       <properties>
+          <descriptor.filter.gestion>${project.basedir}/${descriptor.path}/vabf/filter_gestion_vabf.properties</descriptor.filter.gestion>
+          <descriptor.filter.miroir>${project.basedir}/${descriptor.path}/vabf/filter_miroir_vabf.properties</descriptor.filter.miroir>
+       </properties>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.5</version>
+          <inherited>true</inherited>
+          <configuration>
+              <encoding>UTF-8</encoding>
+<!--              <useDefaultDelimiters>false</useDefaultDelimiters>
+              <delimiters>
+                 <delimiter>$(*)</delimiter>
+              </delimiters>
+-->           
+	  </configuration>
+
+          <executions>
+            <execution>
+              <id>copy-resources-gestion</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.directory}/service-sdd-gestion</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>${project.basedir}/../SDD/target/service-sdd-gestion</directory>
+                    <filtering>true</filtering>
+                    <excludes>
+                      <exclude>**/*ear</exclude>
+                    </excludes>
+                  </resource>
+                </resources>
+                <filters>
+                  <filter>${descriptor.filter.gestion}</filter>
+                </filters>
+              </configuration>
+            </execution>
+            <execution>
+              <id>copy-resources-miroir</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.directory}/service-sdd-miroir</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>${project.basedir}/../SDD/target/service-sdd-miroir</directory>
+                    <filtering>true</filtering>
+                    <excludes>
+                      <exclude>**/*ear</exclude>
+                    </excludes>
+                  </resource>
+                </resources>
+                <filters>
+                  <filter>${descriptor.filter.miroir}</filter>
+                </filters>
+              </configuration>
+            </execution>
+          </executions>
+
+        </plugin>
+    </plugins>
+  </build>
+
+</project>

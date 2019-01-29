@@ -1,0 +1,98 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+  <id>assembly</id>
+  <formats>
+     <format>dir</format>
+     <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory> <!-- si true: alors votre archive contiendra un dossier parent, qui lui contiendra vos fichiers choisis -->
+  <fileSets>
+
+    <fileSet>
+          <outputDirectory>ear/sdd-sint-ear</outputDirectory>
+          <directory>../SDD/target/sdd-sint</directory>
+          <includes>
+             <include>**/*.ear</include> 
+          </includes>
+    </fileSet>
+
+    <fileSet>
+          <outputDirectory>conf/sdd-sint-conf</outputDirectory>
+          <directory>../SDD/target/sdd-sint</directory>
+          <excludes>
+             <exclude>**/*.ear</exclude> 
+          </excludes>
+    </fileSet>
+
+    <fileSet>
+          <outputDirectory>ear/sdd-sme-ear</outputDirectory>
+          <directory>../SDD/target/sdd-sme</directory>
+          <includes>
+             <include>**/*.ear</include> 
+          </includes>
+    </fileSet>
+
+    <fileSet>
+          <outputDirectory>conf/sdd-sme-conf</outputDirectory>
+          <directory>../SDD/target/sdd-sme</directory>
+          <excludes>
+             <exclude>**/*.ear</exclude> 
+          </excludes>
+    </fileSet>
+
+    <fileSet>
+          <outputDirectory>api/sdd-sapp-api</outputDirectory>
+          <directory>../SDD/target/sdd-sapp</directory>
+          <includes>
+             <include>**/*.war</include> 
+          </includes>
+    </fileSet>
+
+
+    <fileSet>
+          <outputDirectory>ear/sdd-sapp-ear</outputDirectory>
+          <directory>../SDD/target/sdd-sapp</directory>
+          <includes>
+             <include>**/*.ear</include> 
+          </includes>
+    </fileSet>
+
+    <fileSet>
+          <outputDirectory>conf/sdd-sapp-conf</outputDirectory>
+          <directory>../SDD/target/sdd-sapp</directory>
+          <excludes>
+             <exclude>**/*.ear</exclude> 
+          </excludes>
+    </fileSet>
+
+    <fileSet>
+          <outputDirectory>ear/service-sdd-gestion-ear</outputDirectory>
+          <directory>../SDD/target/service-sdd-gestion</directory>
+          <includes>
+             <include>**/*.ear</include> 
+          </includes>
+    </fileSet>
+
+    <fileSet>
+          <outputDirectory>conf/service-sdd-gestion-conf</outputDirectory>
+          <directory>../Resources/target/service-sdd-gestion</directory>
+    </fileSet>
+
+    <fileSet>
+          <outputDirectory>ear/service-sdd-miroir-ear</outputDirectory>
+          <directory>../SDD/target/service-sdd-miroir</directory>
+          <includes>
+             <include>**/*.ear</include> 
+          </includes>
+    </fileSet>
+
+    <fileSet>
+          <outputDirectory>conf/service-sdd-miroir-conf</outputDirectory>
+          <directory>../Resources/target/service-sdd-miroir</directory>
+    </fileSet>
+
+  </fileSets>
+
+</assembly>
